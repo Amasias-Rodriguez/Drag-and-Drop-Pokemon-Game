@@ -1,4 +1,4 @@
-const CARDS = 3;
+const CARDS = 13;
 
 for(let i=1; i<= CARDS; i++){
     let id = getRandomId(150)
@@ -10,6 +10,7 @@ function getRandomId(max){
 }
 
 let draggableElements = document.querySelector('.draggable-elements')
+let droppableElements = document.querySelector('.droppable-elements')
 
 let pokemonSearched = [];
 let pokemonNames = [];
@@ -17,20 +18,67 @@ async function searchPokemonById(id){
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`)
     const data = await res.json()
     pokemonSearched.push(data)
-    
     pokemonNames.push(data.name)
 
-    console.log(pokemonNames)
     pokemonNames = pokemonNames.sort(()=>Math.random()-0.5)
-    console.log(pokemonNames)
 
+    // Pokemon Images
     draggableElements.innerHTML = ''
     pokemonSearched.forEach(pokemon =>{
        draggableElements.innerHTML +=
         `<div class="pokemon">
-        <img class="image" 
+        <img id="${pokemon.name}" draggable="true" class="image" 
         src="${pokemon.sprites.other['official-artwork'].front_default}" alt="pokemon">
         </div>`
     } )
+
+
+    // Pokemons Names
+    droppableElements.innerHTML = ''
+    pokemonNames.forEach(name => {
+        droppableElements.innerHTML += `
+            <div class="names">
+                <p>${name}</p>
+            </div>
+        `
+    })
+
+    let pokemons = document.querySelectorAll('.image')
+    pokemons = [...pokemons]
+    pokemons.forEach(pokemon => {
+        pokemon.addEventListener('dragstart', event=>{
+            event.dataTransfer.setData('text', event.target.id)
+        })
+    })
+
+    let names = document.querySelectorAll('.names')
+    let wrongMsg = document.querySelector('.wrong')
+    let points = 0;
+    names = [...names]
+    names.forEach(name => {
+        name.addEventListener('dragover', event=>{
+            event.preventDefault()
+        })
+        name.addEventListener('drop', event=>{
+            const draggableElementData = event.dataTransfer.getData('text');
+            let pokemonElement = document.querySelector(`#${draggableElementData}`)
+            if(event.target.innerText == draggableElementData){
+                console.log('SI')
+                points++
+                event.target.innerHTML = ''
+                event.target.appendChild(pokemonElement)
+                console.log(pokemonElement)
+                wrongMsg.innerText = ''
+
+                if(points == CARDS){
+                    draggableElements.innerHTML = '<p class="win">WIN</p>'
+                }
+
+            }else{
+                console.log('NO')
+                wrongMsg.innerText = 'Ups'
+            }
+        })
+    })
 }
 
