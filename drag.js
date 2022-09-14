@@ -1,7 +1,4 @@
-const CARDS = 10;
-
-fetch('https://pokeapi.co/api/v2/ability/1/')
-.then(res => res.json())const CARDS = 3;
+const CARDS = 3;
 
 for(let i=1; i<= CARDS; i++){
     let id = getRandomId(150)
@@ -15,14 +12,20 @@ function getRandomId(max){
 let draggableElements = document.querySelector('.draggable-elements')
 
 let pokemonSearched = [];
+let pokemonNames = [];
 async function searchPokemonById(id){
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`)
     const data = await res.json()
     pokemonSearched.push(data)
+    
+    pokemonNames.push(data.name)
+
+    console.log(pokemonNames)
+    pokemonNames = pokemonNames.sort(()=>Math.random()-0.5)
+    console.log(pokemonNames)
 
     draggableElements.innerHTML = ''
     pokemonSearched.forEach(pokemon =>{
-        console.log(pokemon.sprites.back_default)
        draggableElements.innerHTML +=
         `<div class="pokemon">
         <img class="image" 
@@ -31,5 +34,3 @@ async function searchPokemonById(id){
     } )
 }
 
-
-.then(data => console.log(data))
